@@ -1,0 +1,30 @@
+<html>
+
+<head>
+    <title>Date Selection</title>
+</head>
+
+<body>
+    <form id="myForm">
+        <fieldset>
+            <p>DATE:<input type="date" id="myDateInput" name="dateInput" min="2024-02-23" max="2024-12-31" required></p>
+            <br>
+            <p>
+            <p><input type="submit" name="submit" value="Submit">
+                <input type="reset" name="reset" value="reset">
+        </fieldset>
+    </form>
+
+    <script>
+        document.getElementById('myDateInput').addEventListener('input', function () {
+            var selectedDate = new Date(this.value);
+            if (selectedDate.getDay() === 0 || selectedDate.getDay() === 6) {
+                alert('Please choose a date that is not a weekend.');
+                this.value = ''; // Clear the input field
+            }
+        });
+    </script>
+
+</body>
+
+</html>
