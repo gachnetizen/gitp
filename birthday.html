@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Surprise 🎉</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #5251b7, #4d3ed5);
+            overflow: hidden;
+        }
+
+        .container {
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .yes {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .no {
+            background: #f44336;
+            color: white;
+            position: absolute;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        /* Cake */
+        .cake {
+            margin: 20px auto;
+            width: 120px;
+        }
+
+        .layer {
+            height: 30px;
+            background: rgb(223, 80, 8);
+            margin: 5px;
+            border-radius: 10px;
+        }
+
+        .candle {
+            width: 10px;
+            height: 30px;
+            background: yellow;
+            margin: auto;
+        }
+
+        .flame {
+            width: 10px;
+            height: 10px;
+            background: orange;
+            border-radius: 50%;
+            animation: flicker 0.3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.3);
+            }
+        }
+
+        /* Fireworks */
+        .firework {
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            to {
+                transform: translate(var(--x), var(--y));
+                opacity: 0;
+            }
+        }
+
+        /* Card */
+        .card {
+            background: rgb(107, 57, 57);
+            padding: 25px;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- FIRST SCREEN -->
+    <div class="container" id="questionBox">
+        <h1>Do you want to open this birthday surprise? 🎁</h1>
+        <input id="nameInput" placeholder="Enter name 💌"><br>
+        <button class="yes" onclick="startCountdown()">Yes</button>
+        <button class="no" id="noBtn">No</button>
+    </div>
+
+    <!-- COUNTDOWN -->
+    <div class="container hidden" id="countdownBox">
+        <h1 id="countText">3</h1>
+    </div>
+
+    <!-- BIRTHDAY SCREEN -->
+    <div class="container hidden" id="yesBox">
+        <h1 id="birthdayText">🎉 Happy Birthday! 🎂</h1>
+
+        <div class="cake">
+            <div class="candle">
+                <div class="flame"></div>
+            </div>
+            <div class="layer"></div>
+            <div class="layer"></div>
+            <div class="layer"></div>
+        </div>
+
+        <button onclick="playMusic()">▶ Play Music 🎵</button>
+    </div>
+
+    <!-- SECOND QUESTION -->
+    <div class="container hidden" id="messageQuestion">
+        <h1>💌 Do you want to read your birthday message?</h1>
+        <button class="yes" onclick="showPassword()">Yes</button>
+        <button class="no" onclick="skipMessage()">No</button>
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="container hidden" id="passwordBox">
+        <h1>🔐 Enter Password</h1>
+        <input type="password" id="passwordInput"><br><br>
+        <button class="yes" onclick="checkPassword()">Unlock</button>
+        <p id="errorText" style="color:red;"></p>
+    </div>
+
+    <!-- CARD -->
+    <div class="container hidden" id="birthdayCard">
+        <div class="card">
+            <h2>🎉 Happy Birthday🎂</h2>
+            <p>
+                We haven't known each other for long but am glad we met.<br>
+                Wishing you a day full of peace and happiness 💖<br>
+                I love you✨
+            </p>
+        </div>
+    </div>
+
+    <!-- NO SCREEN -->
+    <div class="container hidden" id="noBox">
+        <h1>😢</h1>
+        <a href="https://www.youtube.com/watch?v=3JWTaaS7LdU" target="_blank">
+            Sad song 🎶
+        </a>
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="music">
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // RUNAWAY NO BUTTON
+        const noBtn = document.getElementById("noBtn");
+        noBtn.addEventListener("mouseover", () => {
+            noBtn.style.top = Math.random() * window.innerHeight + "px";
+            noBtn.style.left = Math.random() * window.innerWidth + "px";
+        });
+
+        // COUNTDOWN
+        function startCountdown() {
+            document.getElementById("questionBox").classList.add("hidden");
+            document.getElementById("countdownBox").classList.remove("hidden");
+
+            let count = 3;
+            let interval = setInterval(() => {
+                count--;
+                document.getElementById("countText").innerText = count;
+
+                if (count === 0) {
+                    clearInterval(interval);
+                    showYes();
+                }
+            }, 1000);
+        }
+
+        // FIREWORKS
+        function fireworks() {
+            for (let i = 0; i < 80; i++) {
+                let f = document.createElement("div");
+                f.classList.add("firework");
+
+                let x = (Math.random() - 0.5) * 400 + "px";
+                let y = (Math.random() - 0.5) * 400 + "px";
+
+                f.style.setProperty('--x', x);
+                f.style.setProperty('--y', y);
+                f.style.left = "50%";
+                f.style.top = "50%";
+                f.style.background = `hsl(${Math.random() * 360},100%,50%)`;
+
+                document.body.appendChild(f);
+                setTimeout(() => f.remove(), 1000);
+            }
+        }
+
+        // SHOW YES
+        function showYes() {
+            document.getElementById("countdownBox").classList.add("hidden");
+            document.getElementById("yesBox").classList.remove("hidden");
+
+            let name = document.getElementById("nameInput").value;
+            if (name) {
+                document.getElementById("birthdayText").innerText =
+                    "🎉 Happy Birthday, " + name + "! 🎂";
+            }
+
+            fireworks();
+            document.getElementById("music").play().catch(() => { });
+
+            setTimeout(() => {
+                document.getElementById("yesBox").classList.add("hidden");
+                document.getElementById("messageQuestion").classList.remove("hidden");
+            }, 4000);
+        }
+
+        // MUSIC
+        function playMusic() {
+            document.getElementById("music").play();
+        }
+
+        // SECOND FLOW
+        function showPassword() {
+            document.getElementById("messageQuestion").classList.add("hidden");
+            document.getElementById("passwordBox").classList.remove("hidden");
+        }
+
+        function checkPassword() {
+            const correctPassword = "love123"; // change this
+
+            let input = document.getElementById("passwordInput").value;
+
+            if (input === correctPassword) {
+                document.getElementById("passwordBox").classList.add("hidden");
+                document.getElementById("birthdayCard").classList.remove("hidden");
+            } else {
+                document.getElementById("errorText").innerText = "❌ Wrong password!";
+            }
+        }
+
+        function skipMessage() {
+            document.getElementById("messageQuestion").innerHTML =
+                "<h1>Alright 😄 Enjoy your day!</h1>";
+        }
+    </script>
+
+</body>
+
+</html>
